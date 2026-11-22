@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ view_label }} · AI Assistant{% endblock %}
+{% block init %}assistant{% endblock %}
+{% block main_attrs %}data-view="{{ view }}" data-conversation-id="{{ conversation_id or '' }}"{% endblock %}
+{% block crumbs %}<span class="sep">/</span>{% if view == 'settings' %}<span class="cur">AI Assistant</span>{% else %}<a href="{{ url_for('admin.assistant') }}">AI Assistant</a><span class="sep">/</span><span class="cur">{{ view_label }}</span>{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow-sm">AI Assistant</span><h1>{{ 'Your assistant' if view == 'settings' else view_label }}</h1>
+  <p>Your private assistant lives in the floating HUD (bottom-right) and stays with you across every section. It is completely separate from the public site’s guide.</p></div>
+  <div class="actions"><button class="btn primary" type="button" data-open-hud>Open HUD</button></div></div>
+{% set section_label = 'AI Assistant' %}{% include "admin/_subnav.html" %}
+<div id="sec"><div class="skeleton" style="height:160px"></div></div>
+{% endblock %}

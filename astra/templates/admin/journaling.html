@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ view_label }} · Journaling{% endblock %}
+{% block init %}journaling{% endblock %}
+{% block main_attrs %}data-view="{{ view }}" data-entry-id="{{ entry_id or '' }}"{% endblock %}
+{% block crumbs %}<span class="sep">/</span>{% if view == 'write' %}<span class="cur">Journaling</span>{% else %}<a href="{{ url_for('admin.journaling') }}">Journaling</a><span class="sep">/</span><span class="cur">{{ view_label }}</span>{% endif %}{% endblock %}
+{% block content %}
+<div class="journal-realm" id="realm">
+  <canvas class="realm-motes" id="realm-motes" aria-hidden="true"></canvas>
+  <div class="realm-runes" aria-hidden="true"><span>ᚨ</span><span>✦</span><span>ᛟ</span><span>⟡</span><span>ᚱ</span><span>✧</span><span>ᛉ</span></div>
+  <header class="realm-head">
+    <div><span class="realm-eyebrow">Codex of Days</span><h1 class="realm-title">{{ 'The Journal' if view == 'write' else 'Archive of Entries' }}</h1></div>
+    <nav class="realm-nav" aria-label="Journaling sections">
+      <a href="{{ url_for('admin.journaling') }}" class="{{ 'on' if view == 'write' }}">✒ Write</a>
+      <a href="{{ url_for('admin.journaling', view='entries') }}" class="{{ 'on' if view == 'entries' }}">❖ Entries</a>
+    </nav>
+  </header>
+  <div id="sec"></div>
+</div>
+{% endblock %}

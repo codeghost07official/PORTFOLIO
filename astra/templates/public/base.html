@@ -1,0 +1,114 @@
+{% from "_icons.html" import icon %}<!doctype html>
+<html lang="en" data-accent="{{ appearance.accent }}" data-effects="{{ appearance.effects }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}{{ profile.name }} — {{ profile.title }}{% endblock %}</title>
+  <meta name="description" content="{% block description %}{{ profile.intro }}{% endblock %}">
+  <meta property="og:title" content="{{ self.title() }}">
+  <meta property="og:description" content="{{ self.description() }}">
+  <meta name="theme-color" content="#040a16">
+  <script src="{{ url_for('static', filename='js/vt.js') }}"></script>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@500;700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ asset_v }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/public.css') }}?v={{ asset_v }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="public" data-gate="{{ login_path if login_entry in ('logo_dblclick', 'keyboard') else '' }}" data-gate-mode="{{ login_entry }}">
+  <a class="sr-only" href="#main">Skip to content</a>
+  <div class="nav-progress" id="nav-progress" aria-hidden="true"></div>
+  <canvas id="holo-bg" aria-hidden="true"></canvas>
+  <div class="blueprint" aria-hidden="true"></div>
+  <div class="liquid-bg" aria-hidden="true"><i class="lb1"></i><i class="lb2"></i></div>
+  <div class="site">
+    <header class="nav" id="nav">
+      <div class="wrap nav-inner">
+        <a class="brand" href="{{ url_for('public.index') }}" id="brand" aria-label="{{ profile.name }} — home">
+          <span class="brand-mark"><i></i></span><span>ASTRA</span>
+        </a>
+        <button class="btn icon ghost nav-toggle" id="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="nav-links">{{ icon('menu') }}</button>
+        {% macro navlink(endpoint, label) -%}
+          <a href="{{ url_for(endpoint) }}" class="{{ 'active' if request.endpoint == endpoint or (endpoint == 'public.projects' and request.endpoint == 'public.project_detail') }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}>{{ label }}</a>
+        {%- endmacro %}
+        <nav class="nav-links" id="nav-links" aria-label="Main">
+          {{ navlink('public.index', 'Home') }}
+          {{ navlink('public.about', 'About') }}
+          {{ navlink('public.projects', 'Exhibition') }}
+          {% if visibility.show_achievements %}{{ navlink('public.achievements', 'Achievements') }}{% endif %}
+          {% if visibility.show_journey %}{{ navlink('public.journey', 'Journey') }}{% endif %}
+          {% if visibility.show_contact %}{{ navlink('public.contact', 'Contact') }}{% endif %}
+        </nav>
+      </div>
+    </header>
+
+    <div class="welcome-marquee" role="note" aria-label="Welcome">
+      <div class="wm-track"><span>✦ Welcome to ASTRA, the software exhibition of {{ profile.name }} ✦ Step inside, explore the exhibits, and ask the guide anything ✦ Built through curiosity, experimentation and determination </span><span aria-hidden="true">✦ Welcome to ASTRA, the software exhibition of {{ profile.name }} ✦ Step inside, explore the exhibits, and ask the guide anything ✦ Built through curiosity, experimentation and determination </span></div>
+    </div>
+    <main id="main" class="page-enter">{% block content %}{% endblock %}</main>
+
+    <footer class="footer">
+      <div class="wrap footer-grid">
+        <div>
+          <a class="brand" href="{{ url_for('public.index') }}"><span class="brand-mark"><i></i></span><span>ASTRA</span></a>
+          <p class="muted small" style="max-width:22rem;margin-top:.8rem">{{ profile.intro }}</p>
+        </div>
+        <nav aria-label="Footer">
+          <span class="label">Explore</span>
+          <a href="{{ url_for('public.about') }}">About</a>
+          <a href="{{ url_for('public.projects') }}">Exhibition</a>
+          {% if visibility.show_achievements %}<a href="{{ url_for('public.achievements') }}">Achievements</a>{% endif %}
+          {% if visibility.show_journey %}<a href="{{ url_for('public.journey') }}">Journey</a>{% endif %}
+        </nav>
+        <nav aria-label="Elsewhere">
+          <span class="label">Elsewhere</span>
+          {% if profile.github %}<a href="{{ profile.github }}" target="_blank" rel="noopener noreferrer">GitHub</a>{% endif %}
+          {% if profile.youtube %}<a href="{{ profile.youtube }}" target="_blank" rel="noopener noreferrer">YouTube</a>{% endif %}
+          {% if profile.linkedin %}<a href="{{ profile.linkedin }}" target="_blank" rel="noopener noreferrer">LinkedIn</a>{% endif %}
+          {% if visibility.show_contact %}<a href="{{ url_for('public.contact') }}">Contact</a>{% endif %}
+        </nav>
+      </div>
+      <div class="wrap footer-base">
+        <span>© <span id="year"></span> {{ profile.name }} · {{ profile.footer_note }}{% if login_entry == 'footer_glyph' %}<a class="sys-glyph" href="{{ login_path }}" aria-label="System access" title=""></a>{% endif %}</span>
+        <span class="row">
+          {% if profile.github %}<a class="footer-gh" href="{{ profile.github }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub profile of {{ profile.name }}">{{ icon('github') }}</a>{% endif %}
+          <a class="admin-link" href="{{ login_path }}" data-no-transition>{{ icon('settings') }} Admin</a>
+          <span class="mono dim">ASTRA v{{ astra_version }}</span>
+        </span>
+      </div>
+    </footer>
+  </div>
+
+  {% if chatbot.enabled %}
+  <button class="guide-fab" id="guide-fab" aria-label="Open the ASTRA guide" aria-expanded="false" aria-controls="guide-panel">{{ icon('chat') }}</button>
+  <section class="guide-panel panel corners hidden" id="guide-panel" aria-label="ASTRA guide chat" data-greeting="{{ chatbot.greeting }}" data-online="{{ '1' if chatbot.online else '0' }}">
+    <div class="guide-head">
+      <span class="orb" aria-hidden="true"></span>
+      <div><b>ASTRA GUIDE</b><small>{{ 'Online · answers from the public portfolio' if chatbot.online else 'Offline' }}</small></div>
+      <span class="spacer"></span>
+      <button class="btn icon ghost sm" id="guide-close" aria-label="Close chat">{{ icon('close') }}</button>
+    </div>
+    <div class="guide-log" id="guide-log" aria-live="polite"></div>
+    <div class="guide-suggest" id="guide-suggest">
+      <button class="chip" type="button">What are the highlight projects?</button>
+      <button class="chip" type="button">Which technologies are used most?</button>
+      <button class="chip" type="button">Recommend something AI-related</button>
+    </div>
+    <form class="guide-form" id="guide-form" autocomplete="off">
+      <label class="sr-only" for="guide-input">Ask a question</label>
+      <input id="guide-input" type="text" maxlength="600" placeholder="Ask about projects, skills…" required>
+      <button class="btn primary icon" type="submit" aria-label="Send">{{ icon('send') }}</button>
+    </form>
+  </section>
+  {% endif %}
+
+  <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js" defer></script>
+  <script src="{{ url_for('static', filename='js/common.js') }}?v={{ asset_v }}" defer></script>
+  <script src="{{ url_for('static', filename='js/holo.js') }}?v={{ asset_v }}" defer></script>
+  <script src="{{ url_for('static', filename='js/public.js') }}?v={{ asset_v }}" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ view_label }} · Medicines{% endblock %}
+{% block init %}medicines{% endblock %}
+{% block main_attrs %}data-view="{{ view }}"{% endblock %}
+{% block crumbs %}<span class="sep">/</span>{% if view == subnav[0][0] %}<span class="cur">Medicines</span>{% else %}<a href="{{ url_for('admin.medicines') }}">Medicines</a><span class="sep">/</span><span class="cur">{{ view_label }}</span>{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow-sm">Medicines</span><h1>{{ 'Medicines' if view == subnav[0][0] else view_label }}</h1><p>Track doses and adherence. Organisation only, not medical advice.</p></div>
+  <div class="actions"><button class="btn primary" type="button" data-add-med>+ Add medicine</button></div></div>
+{% set section_label = 'Medicines' %}{% include "admin/_subnav.html" %}
+<div id="sec"><div class="skeleton" style="height:120px"></div></div>
+{% endblock %}

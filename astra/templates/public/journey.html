@@ -1,0 +1,55 @@
+{% extends "public/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Journey — {{ profile.name }}{% endblock %}
+{% block content %}
+{% set chapters = events|selectattr('kind', 'equalto', 'milestone')|list %}
+{% set launches = events|rejectattr('kind', 'equalto', 'milestone')|sort(attribute='sort', reverse=True)|list %}
+<section class="wrap page-hero">
+  <span class="eyebrow">Hall 04 · Trajectory</span>
+  <h1>My journey</h1>
+  <p class="lead">The chapters so far, every project launch and completion, and the most recent build logs.</p>
+</section>
+
+<div class="wrap journey-layout">
+  <section aria-labelledby="ch-title">
+    <h2 class="label" id="ch-title" style="margin-bottom:1.2rem">Chapters</h2>
+    {% if chapters %}
+    <div class="timeline">
+      {% for j in chapters %}
+      <div class="tl-item reveal"><div class="when">{{ j.date }}</div><h4>{{ j.title }}</h4><p>{{ j.detail }}</p></div>
+      {% endfor %}
+    </div>
+    {% else %}<p class="muted">No chapters written yet.</p>{% endif %}
+  </section>
+
+  <section aria-labelledby="ll-title">
+    <h2 class="label" id="ll-title" style="margin-bottom:1.2rem">Launch log</h2>
+    {% if launches %}
+    <div class="launch-log">
+      {% for e in launches %}
+      <a class="launch reveal {{ e.kind }}" href="{{ url_for('public.project_detail', slug=e.slug) }}">
+        <span class="mono small">{{ e.date|date }}</span>
+        <span class="launch-dot" aria-hidden="true"></span>
+        <span><b>{{ e.title }}</b>{% if e.detail %}<br><span class="muted small">{{ e.detail }}</span>{% endif %}</span>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}<p class="muted">Project dates will appear here.</p>{% endif %}
+  </section>
+</div>
+
+{% if logs %}
+<section class="wrap block">
+  <div class="section-head reveal"><div><span class="eyebrow">Build notes</span><h2>From the development journals</h2></div></div>
+  <div class="log-grid">
+    {% for j in logs %}
+    <a class="panel log-card reveal" href="{{ url_for('public.project_detail', slug=j.slug) }}#s-journal">
+      <span class="mono small" style="color:var(--accent)">{{ j.entry_date|date }} · {{ j.project_name }}</span>
+      <h3>{{ j.title }}</h3>
+      <p class="muted small">{{ j.content|excerpt(170) }}</p>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

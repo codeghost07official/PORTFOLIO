@@ -1,0 +1,40 @@
+{% extends "public/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Contact — {{ profile.name }}{% endblock %}
+{% block content %}
+<section class="wrap page-hero">
+  <span class="eyebrow">Transmission</span>
+  <h1>Open a channel</h1>
+  <p class="lead">Questions, collaborations or opportunities. Pick whichever channel suits you.</p>
+</section>
+<section class="wrap contact-layout">
+  <div class="channels">
+    {% set channels = [
+      ('mail', 'Email', 'mailto:' ~ profile.email if profile.email else '', profile.email, 'Primary inbox for questions, collaborations and opportunities'),
+      ('mail', 'Email (personal)', 'mailto:' ~ profile.email2 if profile.email2 else '', profile.email2, 'Alternate address that also reaches me directly'),
+      ('phone', 'Phone', 'tel:' ~ (profile.phone|replace(' ', '')|replace('-', '')) if profile.phone else '', profile.phone, 'Call or message'),
+      ('github', 'GitHub', profile.github, profile.github|replace('https://', ''), 'Source code and open-source work'),
+      ('youtube', 'YouTube', profile.youtube, profile.youtube|replace('https://', ''), 'Demos, devlogs and walkthroughs'),
+      ('linkedin', 'LinkedIn', profile.linkedin, profile.linkedin|replace('https://', ''), 'Professional profile'),
+      ('twitter', 'X / Twitter', profile.twitter, profile.twitter|replace('https://', ''), 'Updates and quick thoughts'),
+      ('globe', 'Website', profile.website, profile.website|replace('https://', ''), 'Personal site'),
+    ] %}
+    {% set ns = namespace(n=0) %}
+    {% for ic, name, href, shown, desc in channels if href %}{% set ns.n = ns.n + 1 %}
+    <a class="panel channel reveal" href="{{ href }}" {% if href.startswith('http') %}target="_blank" rel="noopener noreferrer"{% endif %}>
+      <span class="channel-icon">{{ icon(ic) }}</span>
+      <span class="channel-body"><b>{{ name }}</b><span class="muted small">{{ desc }}</span><span class="mono small" style="color:var(--accent)">{{ shown }}</span></span>
+      <span class="hall-go">{{ icon('external' if href.startswith('http') else 'arrow') }}</span>
+    </a>
+    {% endfor %}
+    {% if ns.n == 0 %}<div class="panel empty"><div class="empty-icon">{{ icon('mail') }}</div><h4>Channels coming online</h4><p>Contact details haven't been published yet.</p></div>{% endif %}
+  </div>
+  <aside class="panel pad corners contact-aside reveal">
+    <span class="eyebrow">Signal status</span>
+    <h3 style="margin-top:.3rem">Receiving</h3>
+    {% if profile.location %}<p class="row muted small">{{ icon('pin') }} {{ profile.location }}</p>{% endif %}
+    <p class="muted small">I read every message. Mentioning a project from the exhibition makes it easy to pick up the context.</p>
+    {% if chatbot.enabled %}<button class="btn" type="button" data-open-guide>{{ icon('chat') }} Ask the AI guide first</button>{% endif %}
+  </aside>
+</section>
+{% endblock %}

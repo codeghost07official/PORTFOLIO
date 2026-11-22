@@ -1,0 +1,7 @@
+{# Section sub-navigation (real links; the router swaps #main only). #}
+<nav class="os-subnav" aria-label="{{ section_label }} sections">
+  {% for v, vl in subnav %}
+  {% set href = {'projects': url_for('admin.project_list'), 'exhibits': url_for('admin.exhibits'), 'profile': url_for('admin.profile')}.get(v) if page == 'projects' else (url_for('admin.' ~ page) ~ ('' if loop.first else '/' ~ v)) %}
+  <a href="{{ href }}" class="{{ 'on' if view == v }}"{% if view == v %} aria-current="page"{% endif %}>{{ vl }}</a>
+  {% endfor %}
+</nav>

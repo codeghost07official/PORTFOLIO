@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% block title %}Exhibit Management{% endblock %}
+{% block init %}exhibits{% endblock %}
+{% block crumbs %}<span class="sep">/</span><a href="{{ url_for('admin.project_list') }}">Projects</a><span class="sep">/</span><span class="cur">Exhibit Management</span>{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow-sm">Projects · public exhibition</span><h1>Exhibit Management</h1>
+  <p>What visitors see for each project. Only <b>completed</b> projects with a <b>published</b> exhibit open publicly. In-progress projects show their title and an “In progress” badge, nothing more.</p></div></div>
+{% set section_label = 'Projects' %}{% include "admin/_subnav.html" %}
+<div id="xlist"></div>
+{% endblock %}

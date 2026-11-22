@@ -1,0 +1,19 @@
+{% extends "public/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ project.name }} — in progress · {{ profile.name }}{% endblock %}
+{% block description %}{{ project.name }} is currently being built.{% endblock %}
+{% block content %}
+<section class="wrap wip-page">
+  <div class="glass wip-panel corners">
+    <span class="wip-badge big"><i></i>In progress</span>
+    <h1>{{ project.name }}</h1>
+    {% if project.category %}<p class="proj-cat">{{ project.category }}</p>{% endif %}
+    <p class="lead">This exhibit is still being built. Its full story, features and links will be published here once it's complete.</p>
+    <div class="wip-bar" aria-hidden="true"><span></span></div>
+    <div class="row wrap" style="justify-content:center;margin-top:1.6rem">
+      <a class="btn primary" href="{{ url_for('public.projects') }}">{{ icon('back') }} Back to the exhibition</a>
+      {% if visibility.show_contact %}<a class="btn" href="{{ url_for('public.contact') }}">Get in touch</a>{% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

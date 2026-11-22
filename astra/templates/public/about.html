@@ -1,0 +1,71 @@
+{% extends "public/base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}About — {{ profile.name }}{% endblock %}
+{% block content %}
+<section class="wrap page-hero">
+  <span class="eyebrow">Hall 02 · Identity</span>
+  <h1>About me</h1>
+  <p class="lead">{{ profile.title }}</p>
+</section>
+
+<section class="wrap about-layout">
+  <aside class="about-card panel corners reveal">
+    <div class="avatar-frame">
+      {% if profile.avatar %}<img src="{{ profile.avatar }}" alt="Portrait of {{ profile.name }}">{% else %}<div class="avatar-fallback" aria-hidden="true">{{ profile.name[:1] }}</div>{% endif %}
+    </div>
+    <h2 class="about-name">{{ profile.name }}</h2>
+    <p class="muted small" style="text-align:center;margin-top:0">{{ profile.title }}</p>
+    <dl class="dossier">
+      {% if profile.location %}<div><dt>Base</dt><dd>{{ profile.location }}</dd></div>{% endif %}
+      <div><dt>Exhibits</dt><dd>{{ stats.projects }}</dd></div>
+      <div><dt>Shipped</dt><dd>{{ stats.completed }}</dd></div>
+      <div><dt>In progress</dt><dd>{{ stats.active }}</dd></div>
+      <div><dt>Stack</dt><dd>{{ stats.technologies }} technologies</dd></div>
+    </dl>
+    <div class="row wrap" style="justify-content:center">
+      {% if profile.github %}<a class="btn sm" href="{{ profile.github }}" target="_blank" rel="noopener noreferrer">{{ icon('github') }} GitHub</a>{% endif %}
+      {% if profile.youtube %}<a class="btn sm" href="{{ profile.youtube }}" target="_blank" rel="noopener noreferrer">{{ icon('youtube') }} YouTube</a>{% endif %}
+      {% if visibility.show_contact %}<a class="btn sm primary" href="{{ url_for('public.contact') }}">{{ icon('mail') }} Contact</a>{% endif %}
+    </div>
+  </aside>
+  <div class="stack-xl">
+    <article class="panel pd-section reveal">
+      <h2>Profile</h2>
+      <div class="md md-lg">{{ profile.about|markdown }}</div>
+    </article>
+    {% if visibility.show_interests and profile.interests %}
+    <article class="panel pd-section reveal">
+      <h2>Domains & interests</h2>
+      <div class="interest-grid">{% for i in profile.interests %}<div class="interest"><span class="mono dim small">{{ '%02d'|format(loop.index) }}</span>{{ i }}</div>{% endfor %}</div>
+    </article>
+    {% endif %}
+  </div>
+</section>
+
+{% if visibility.show_skills and (profile.skills or technologies) %}
+<section class="wrap block" id="arsenal" aria-labelledby="ars-title">
+  <div class="section-head reveal"><div><span class="eyebrow">Arsenal</span><h2 id="ars-title">Technologies & skills</h2>
+    <p>Skill groups, plus every technology used across the exhibition. Select one to see the projects built with it.</p></div></div>
+  <div class="skills-grid">
+    {% for s in profile.skills %}
+    <div class="panel pad skill-group reveal"><h4>{{ s.group }}</h4><div class="chips">{% for i in s['items'] %}<span class="chip">{{ i }}</span>{% endfor %}</div></div>
+    {% endfor %}
+  </div>
+  {% if technologies %}
+  <div class="panel pad reveal" style="margin-top:1.25rem">
+    <h4 class="label">Used in exhibits</h4>
+    <div class="tech-bars">
+      {% set top = technologies[0].n if technologies else 1 %}
+      {% for t in technologies[:16] %}
+      <a class="tech-bar" href="{{ url_for('public.projects', tech=t.name) }}"><span>{{ t.name }}</span><i style="--w: {{ (100 * t.n / top)|round(0) }}%"></i><b>{{ t.n }}</b></a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="wrap block next-hall">
+  <a class="panel hall-next reveal" href="{{ url_for('public.projects') }}"><span class="eyebrow">Next hall</span><h3>Enter the exhibition {{ icon('arrow') }}</h3></a>
+</section>
+{% endblock %}

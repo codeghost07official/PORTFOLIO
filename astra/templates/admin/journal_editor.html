@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ 'Edit entry' if entry_id else 'New entry' }}{% endblock %}
+{% block init %}journal-editor{% endblock %}
+{% block main_attrs %}data-entry-id="{{ entry_id or '' }}" data-project-id="{{ project.id }}"{% endblock %}
+{% block crumbs %}<span class="sep">/</span><a href="{{ url_for('admin.project_list') }}">Projects</a><span class="sep">/</span><a href="{{ url_for('admin.workspace', pid=project.id) }}">{{ project.name }}</a><span class="sep">/</span><a href="{{ url_for('admin.workspace', pid=project.id, tab='journal') }}">Journal</a><span class="sep">/</span><span class="cur" id="crumb-title">{{ 'Edit entry' if entry_id else 'New entry' }}</span>{% endblock %}
+{% block content %}
+<div class="editor-shell" id="jeditor">
+  <section class="panel editor">
+    <label class="sr-only" for="je-title">Title</label>
+    <input class="editor-title" id="je-title" placeholder="Entry title…" maxlength="200" autocomplete="off">
+    <div class="md-toolbar" role="toolbar" aria-label="Formatting">
+      <button type="button" data-md="h2" title="Heading">H2</button><button type="button" data-md="h3" title="Subheading">H3</button>
+      <span class="sep"></span>
+      <button type="button" data-md="bold" title="Bold (Ctrl+B)"><b>B</b></button><button type="button" data-md="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+      <button type="button" data-md="strike" title="Strikethrough"><s>S</s></button><button type="button" data-md="code" title="Inline code">`c`</button>
+      <span class="sep"></span>
+      <button type="button" data-md="ul" title="Bullet list">• list</button><button type="button" data-md="ol" title="Numbered list">1. list</button>
+      <button type="button" data-md="task" title="Task list">☐ task</button><button type="button" data-md="quote" title="Quote">❝</button>
+      <span class="sep"></span>
+      <button type="button" data-md="link" title="Link (Ctrl+K inside editor)">link</button><button type="button" data-md="image" title="Image">img</button>
+      <button type="button" data-md="codeblock" title="Code block">{ }</button><button type="button" data-md="table" title="Table">table</button><button type="button" data-md="hr" title="Divider">—</button>
+      <span class="spacer"></span>
+      <div class="seg" role="group" aria-label="Editor mode"><button type="button" data-mode="write">Write</button><button type="button" data-mode="split" class="on">Split</button><button type="button" data-mode="preview">Preview</button></div>
+    </div>
+    <div class="editor-panes" id="je-panes">
+      <div class="pane-write"><label class="sr-only" for="je-content">Content (Markdown)</label><textarea id="je-content" spellcheck="true" placeholder="## What happened today&#10;&#10;Write in Markdown — code blocks, tables, task lists all supported."></textarea></div>
+      <div class="pane-preview md" id="je-preview" aria-live="polite"></div>
+    </div>
+    <div class="row" style="padding:.55rem 1rem;border-top:1px solid var(--line)"><span class="save-state" id="je-state">Not saved yet</span><span class="spacer"></span><span class="word-count" id="je-words">0 words</span></div>
+  </section>
+  <aside class="stack">
+    <section class="panel pad">
+      <h3 class="panel-title">Project journal · {{ project.name }}</h3>
+      <div class="stack">
+        <div class="field"><label for="je-date">Date</label><input type="date" id="je-date"></div>
+        <div class="field"><label for="je-tags">Tags</label><input id="je-tags" placeholder="architecture, bugfix, decision"></div>
+        <p class="hint dim small" style="margin:0">Private. Never shown on the public site. Gemini uses it to draft the project exhibit.</p>
+      </div>
+    </section>
+    <section class="panel pad stack">
+      <button class="btn primary" type="button" id="je-save" style="width:100%">Save entry <span class="kbd">Ctrl S</span></button>
+      {% if entry_id %}<a class="btn ghost" href="{{ url_for('admin.journal_read', jid=entry_id) }}" style="width:100%">Open reading view</a>{% endif %}
+      <a class="btn ghost" href="{{ url_for('admin.workspace', pid=project.id, tab='journal') }}" style="width:100%">Back to journal</a>
+      <button class="btn danger hidden" type="button" id="je-delete" style="width:100%">Delete entry</button>
+      <p class="hint dim small" style="margin:0">Autosaves a few seconds after you stop typing.</p>
+    </section>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/admin/journal.js') }}?v={{ asset_v }}" defer></script>{% endblock %}

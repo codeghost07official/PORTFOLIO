@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import icon %}
+{% set labels = {'overview': 'Overview', 'journal': 'Journal', 'exhibit': 'Exhibit'} %}
+{% block title %}{{ labels[tab] }} · {{ project.name }}{% endblock %}
+{% block init %}workspace{% endblock %}
+{% block main_attrs %}data-project-id="{{ project.id }}" data-tab="{{ tab }}"{% endblock %}
+{% block crumbs %}<span class="sep">/</span><a href="{{ url_for('admin.project_list') }}">Projects</a><span class="sep">/</span>{% if tab == 'overview' %}<span class="cur">{{ project.name }}</span>{% else %}<a href="{{ url_for('admin.workspace', pid=project.id) }}">{{ project.name }}</a><span class="sep">/</span><span class="cur">{{ labels[tab] }}</span>{% endif %}{% endblock %}
+{% block content %}
+<div class="ws-head">
+  <div style="min-width:0">
+    <div class="row wrap"><span class="eyebrow-sm" style="margin:0">Project workspace</span>
+      <span class="badge b-{{ project.status }}">{{ 'Completed' if project.status == 'completed' else 'In progress' }}</span>
+      {% if project.exhibit_published %}<span class="badge b-published">Exhibit published</span>{% endif %}</div>
+    <h1>{{ project.name }}</h1>
+    {% if project.category %}<p class="muted" style="margin:0">{{ project.category }}</p>{% endif %}
+  </div>
+  <div class="row wrap" id="ws-actions">
+    <button class="btn {{ 'primary' if project.status != 'completed' }}" type="button" data-act="toggle">{{ '↺ Mark in progress' if project.status == 'completed' else '✓ Mark completed' }}</button>
+    <button class="btn" type="button" data-act="edit">{{ icon('edit') }} Edit</button>
+    <button class="btn danger" type="button" data-act="delete">{{ icon('trash') }} Delete</button>
+  </div>
+</div>
+<nav class="ws-nav" aria-label="Project sections">
+  <a href="{{ url_for('admin.workspace', pid=project.id) }}" class="{{ 'on' if tab == 'overview' }}">Overview</a>
+  <a href="{{ url_for('admin.workspace', pid=project.id, tab='journal') }}" class="{{ 'on' if tab == 'journal' }}">Journal <span class="count">{{ project.journal_count }}</span></a>
+  <a href="{{ url_for('admin.workspace', pid=project.id, tab='exhibit') }}" class="{{ 'on' if tab == 'exhibit' }}">Exhibit</a>
+</nav>
+<section id="ws-pane"><div class="skeleton" style="height:180px"></div></section>
+{% endblock %}

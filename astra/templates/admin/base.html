@@ -1,0 +1,83 @@
+{% from "_icons.html" import icon %}<!doctype html>
+<html lang="en" data-effects="lite">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block title %}Personal OS{% endblock %} · ASTRA</title>
+  <script src="{{ url_for('static', filename='js/vt.js') }}"></script>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Orbitron:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Rajdhani:wght@500;600&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ asset_v }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v={{ asset_v }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/os.css') }}?v={{ asset_v }}">
+</head>
+<body class="admin" data-login-path="{{ login_path }}">
+<div class="shell {{ 'rail' if request.cookies.get('astra_rail') == '1' }}" id="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Personal OS navigation">
+    <div class="side-top">
+      <a class="brand" href="{{ url_for('admin.project_list') }}"><span class="brand-mark" style="width:26px;height:26px;position:relative"><i></i></span><span class="side-label">ASTRA</span></a>
+      <button class="btn icon ghost sm rail-toggle" type="button" id="rail-toggle" aria-label="Collapse sidebar" title="Collapse sidebar">«</button>
+    </div>
+    <nav class="side-scroll" id="side-nav">
+      {% set groups = [
+        ('projects', 'Projects', 'folder', url_for('admin.project_list')),
+        ('medicines', 'Medicines', 'pulse', url_for('admin.medicines')),
+        ('tasks', 'Tasks', 'check', url_for('admin.tasks')),
+        ('journaling', 'Journaling', 'journal', url_for('admin.journaling')),
+        ('expenses', 'Expenses', 'layers', url_for('admin.expenses')),
+        ('assistant', 'AI Assistant', 'cpu', url_for('admin.assistant')),
+      ] %}
+      {% for key, label, ic, href in groups %}
+      <a class="side-link {{ 'active' if page == key }}" href="{{ href }}" title="{{ label }}"{% if page == key %} aria-current="page"{% endif %}>{{ icon(ic) }}<span class="side-label">{{ label }}</span></a>
+      {% endfor %}
+    </nav>
+    <div class="side-foot">
+      <div class="side-status turso" title="{{ db_info().label }}"><i></i><span class="side-label">Turso · synced</span></div>
+      <a class="side-link {{ 'active' if page == 'system' }}" href="{{ url_for('admin.settings') }}" title="System">{{ icon('settings') }}<span class="side-label">System</span></a>
+      <a class="side-link" href="{{ url_for('public.index') }}" target="_blank" rel="noopener" title="View public site">{{ icon('eye') }}<span class="side-label">Public site</span></a>
+      <form method="post" action="{{ url_for('auth.logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="side-link" type="submit" title="Sign out">{{ icon('logout') }}<span class="side-label">Sign out</span></button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="btn icon ghost menu-btn" id="menu-btn" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">{{ icon('menu') }}</button>
+      <nav class="crumbs-admin" aria-label="Breadcrumb" id="crumbs">
+        <a href="{{ url_for('admin.home') }}">ASTRA</a>
+        {% block crumbs %}{% endblock %}
+      </nav>
+      <span class="spacer"></span>
+      <button class="search-trigger" type="button" id="search-trigger">{{ icon('search') }}<span class="lbl">Jump to…</span><span class="kbd">Ctrl K</span></button>
+      <button class="btn sm primary" type="button" data-quick-task title="Quick task (Q)">{{ icon('plus') }}<span class="hide-sm">Task</span></button>
+    </header>
+    <div class="os-marquee" role="status" aria-label="Welcome">
+      <div class="os-marquee-track" id="os-marquee"><span>Welcome back, Sir · ASTRA personal OS online · all systems nominal</span><span aria-hidden="true">Welcome back, Sir · ASTRA personal OS online · all systems nominal</span></div>
+    </div>
+    <main class="content page-enter" id="main" data-init="{% block init %}{% endblock %}" {% block main_attrs %}{% endblock %}>
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+<div class="nav-progress" id="nav-progress" aria-hidden="true"></div>
+
+{% include "admin/_hud.html" %}
+
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js" defer></script>
+<script src="{{ url_for('static', filename='js/common.js') }}?v={{ asset_v }}" defer></script>
+<script src="{{ url_for('static', filename='js/admin/core.js') }}?v={{ asset_v }}" defer></script>
+<script src="{{ url_for('static', filename='js/admin/projects.js') }}?v={{ asset_v }}" defer></script>
+<script src="{{ url_for('static', filename='js/admin/journal.js') }}?v={{ asset_v }}" defer></script>
+<script src="{{ url_for('static', filename='js/admin/life.js') }}?v={{ asset_v }}" defer></script>
+<script src="{{ url_for('static', filename='js/admin/journaling.js') }}?v={{ asset_v }}" defer></script>
+<script src="{{ url_for('static', filename='js/admin/settings.js') }}?v={{ asset_v }}" defer></script>
+<script src="{{ url_for('static', filename='js/admin/assistant.js') }}?v={{ asset_v }}" defer></script>
+<script src="{{ url_for('static', filename='js/admin/hud.js') }}?v={{ asset_v }}" defer></script>
+</body>
+</html>

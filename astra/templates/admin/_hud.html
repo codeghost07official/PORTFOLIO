@@ -1,0 +1,32 @@
+<!-- Personal assistant HUD: rendered once by the admin shell and kept alive across navigation. -->
+<div class="hud" id="hud" data-state="idle">
+  <button class="hud-launcher" id="hud-launcher" type="button" aria-label="Open personal assistant" aria-expanded="false" aria-controls="hud-panel">
+    <span class="hud-ring r1"></span><span class="hud-ring r2"></span><span class="hud-core"></span>
+  </button>
+  <section class="hud-panel hidden" id="hud-panel" role="dialog" aria-label="Personal assistant">
+    <header class="hud-head">
+      <span class="hud-orb" aria-hidden="true"></span>
+      <div class="hud-id"><b id="hud-name">ASTRA</b><small id="hud-status">Standing by</small></div>
+      <span class="spacer"></span>
+      <button class="hud-btn" type="button" id="hud-new" title="New conversation" aria-label="New conversation">＋</button>
+      <button class="hud-btn" type="button" id="hud-mute" title="Mute voice" aria-label="Mute voice" aria-pressed="false">🔊</button>
+      <button class="hud-btn" type="button" id="hud-settings-btn" title="Voice controls" aria-label="Voice controls" aria-expanded="false">⚙</button>
+      <button class="hud-btn" type="button" id="hud-close" title="Close" aria-label="Close assistant">✕</button>
+    </header>
+    <div class="hud-controls hidden" id="hud-controls">
+      <label>Voice<select id="hud-voice"></select></label>
+      <label>Volume<input type="range" id="hud-volume" min="0" max="1" step="0.05"></label>
+      <label>Speed<input type="range" id="hud-rate" min="0.6" max="1.6" step="0.05"></label>
+      <button class="hud-btn wide" type="button" id="hud-stop">Stop speaking</button>
+    </div>
+    <div class="hud-log" id="hud-log" aria-live="polite"></div>
+    <form class="hud-input" id="hud-form" autocomplete="off">
+      <button class="hud-mic" type="button" id="hud-mic" title="Speak (hold Ctrl+M)" aria-label="Speak a prompt" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      </button>
+      <label class="sr-only" for="hud-text">Message</label>
+      <textarea id="hud-text" rows="1" placeholder="Ask anything, Sir…"></textarea>
+      <button class="hud-send" type="submit" aria-label="Send">➤</button>
+    </form>
+  </section>
+</div>

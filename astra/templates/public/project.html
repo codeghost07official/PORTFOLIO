@@ -1,0 +1,134 @@
+{% extends "public/base.html" %}
+{% from "public/_macros.html" import link_buttons, project_card %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ project.name }} — {{ profile.name }}{% endblock %}
+{% block description %}{{ project.tagline or (project.description|excerpt(160)) }}{% endblock %}
+{% block content %}
+{% set sections = [
+  ('overview', 'Overview', project.description),
+  ('problem', 'Problem it solves', project.problem),
+  ('why', 'Why I built it', project.motivation),
+  ('features', 'Features', project.features),
+  ('architecture', 'Architecture & how it works', project.architecture),
+  ('process', 'Development process', project.process),
+  ('challenges', 'Challenges', project.challenges),
+  ('solutions', 'Solutions', project.solutions),
+  ('learnings', 'What I learned', project.learnings),
+  ('achievements', 'Achievements', project.achievements),
+  ('future', 'Future improvements', project.future),
+  ('docs', 'Documentation', project.documentation),
+] %}
+{% set has_media = project.gallery or youtube_embed %}
+{% set has_links = project.github_url or project.live_url or project.youtube_url or project.links %}
+{% set has_timeline = milestones or project.start_date or project.completed_date %}
+<div class="read-progress" id="read-progress" aria-hidden="true"></div>
+<article class="exhibit">
+  {% if project.cover_image %}<div class="pd-backdrop" aria-hidden="true" style="background-image:url('{{ project.cover_image }}')"></div>{% endif %}
+  <section class="wrap pd-hero">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="{{ url_for('public.index') }}">Home</a> / <a href="{{ url_for('public.projects') }}">Exhibition</a>{% if project.category %} / <a href="{{ url_for('public.projects', category=project.category) }}">{{ project.category }}</a>{% endif %} / <span aria-current="page">{{ project.name }}</span>
+      <span class="exhibit-no">EXHIBIT {{ '%02d'|format(exhibit_no) }} / {{ '%02d'|format(exhibit_total) }}</span></nav>
+    <div class="pd-head">
+      <div>
+        <div class="row wrap" style="margin-bottom:1rem">
+          <span class="badge b-{{ project.status }}">{{ project.status|label }}</span>
+          {% if project.category %}<span class="badge plain">{{ project.category }}</span>{% endif %}
+          {% if project.is_featured %}<span class="badge plain">Featured</span>{% endif %}
+        </div>
+        <h1>{{ project.name }}</h1>
+        {% if project.tagline %}<p class="tagline">{{ project.tagline }}</p>{% endif %}
+        {% if project.technologies %}<div class="chips" style="margin:1.2rem 0">{% for t in project.technologies %}<span class="chip">{{ t }}</span>{% endfor %}</div>{% endif %}
+        <div class="row wrap">{{ link_buttons(project, '') }}</div>
+      </div>
+      <div class="pd-cover panel corners">
+        {% if project.cover_image %}<img src="{{ project.cover_image }}" alt="{{ project.name }} cover">{% else %}<div class="proj-cover" style="height:100%;aspect-ratio:auto"><span class="cover-fallback">{{ project.name[:2]|upper }}</span></div>{% endif %}
+      </div>
+    </div>
+    <div class="pd-meta">
+      <div><div class="k">Status</div><div class="v">{{ project.status|label }}</div></div>
+      {% if project.start_date %}<div><div class="k">Started</div><div class="v">{{ project.start_date|date }}</div></div>{% endif %}
+      {% if project.completed_date %}<div><div class="k">Completed</div><div class="v">{{ project.completed_date|date }}</div></div>{% endif %}
+      {% if project.category %}<div><div class="k">Domain</div><div class="v">{{ project.category }}</div></div>{% endif %}
+      <div><div class="k">Stack</div><div class="v">{{ project.technologies|length }} technologies</div></div>
+    </div>
+  </section>
+
+  <div class="wrap pd-layout">
+    <nav class="toc" aria-label="On this page">
+      {% for key, title, body in sections if body and body.strip() %}<a href="#s-{{ key }}">{{ title }}</a>{% endfor %}
+      <div id="doc-toc" class="doc-toc"></div>
+      {% if project.technologies %}<a href="#s-stack">Tech stack</a>{% endif %}
+      {% if has_links %}<a href="#s-links">Links</a>{% endif %}
+      {% if has_media %}<a href="#s-media">Media</a>{% endif %}
+      {% if has_timeline %}<a href="#s-timeline">Timeline</a>{% endif %}
+      {% if journals %}<a href="#s-journal">Development journal</a>{% endif %}
+    </nav>
+    <div>
+      {% set ns = namespace(i=0) %}
+      {% for key, title, body in sections if body and body.strip() %}{% set ns.i = ns.i + 1 %}
+      <section class="panel pd-section reveal" id="s-{{ key }}"><h2><span class="idx">{{ '%02d'|format(ns.i) }}</span>{{ title }}</h2><div class="md">{{ body|markdown }}</div></section>
+      {% endfor %}
+
+      {% if project.technologies %}{% set ns.i = ns.i + 1 %}
+      <section class="panel pd-section reveal" id="s-stack"><h2><span class="idx">{{ '%02d'|format(ns.i) }}</span>Tech stack</h2>
+        <div class="chips">{% for t in project.technologies %}<span class="chip">{{ t }}</span>{% endfor %}</div>
+        {% if project.tags %}<p class="muted small" style="margin-top:1rem">Tags: {{ project.tags|join(' · ') }}</p>{% endif %}
+      </section>
+      {% endif %}
+
+      {% if has_links %}{% set ns.i = ns.i + 1 %}
+      <section class="panel pd-section reveal" id="s-links"><h2><span class="idx">{{ '%02d'|format(ns.i) }}</span>Links</h2>
+        <div class="row wrap">{{ link_buttons(project, '') }}
+          {% for l in project.links %}<a class="btn" href="{{ l.url }}" target="_blank" rel="noopener noreferrer">{{ icon('link') }} {{ l.label }}</a>{% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      {% if has_media %}{% set ns.i = ns.i + 1 %}
+      <section class="panel pd-section reveal" id="s-media"><h2><span class="idx">{{ '%02d'|format(ns.i) }}</span>Screenshots & media</h2>
+        {% if youtube_embed %}<div class="video" style="margin-bottom:1rem"><iframe src="{{ youtube_embed }}" title="{{ project.name }} video" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>{% endif %}
+        {% if project.gallery %}<div class="gallery">{% for g in project.gallery %}<button type="button" data-lightbox="{{ g }}" aria-label="Enlarge screenshot {{ loop.index }}"><img src="{{ g }}" alt="{{ project.name }} screenshot {{ loop.index }}" loading="lazy"></button>{% endfor %}</div>{% endif %}
+      </section>
+      {% endif %}
+
+      {% if has_timeline %}{% set ns.i = ns.i + 1 %}
+      <section class="panel pd-section reveal" id="s-timeline"><h2><span class="idx">{{ '%02d'|format(ns.i) }}</span>Development timeline</h2>
+        <div class="ms-line">
+          {% if project.start_date %}<div class="ms done"><b>Project started</b><div class="muted small mono">{{ project.start_date|date }}</div></div>{% endif %}
+          {% for m in milestones %}
+          <div class="ms {{ m.status }}"><b>{{ m.title }}</b> <span class="badge b-{{ m.status }}">{{ m.status|label }}</span>
+            <div class="muted small mono">{{ (m.completed_at or m.target_date)|date }}</div>
+            {% if m.description %}<div class="muted small">{{ m.description|excerpt(200) }}</div>{% endif %}</div>
+          {% endfor %}
+          {% if project.completed_date %}<div class="ms done"><b>Completed</b><div class="muted small mono">{{ project.completed_date|date }}</div></div>{% endif %}
+        </div>
+      </section>
+      {% endif %}
+
+      {% if journals %}{% set ns.i = ns.i + 1 %}
+      <section class="panel pd-section reveal" id="s-journal"><h2><span class="idx">{{ '%02d'|format(ns.i) }}</span>Development journal</h2>
+        {% for j in journals %}
+        <details class="journal-entry" {{ 'open' if loop.first }}>
+          <summary><span class="date">{{ j.entry_date|date }}</span><h3>{{ j.title }}</h3></summary>
+          {% if j.tags %}<div class="chips" style="margin-top:.6rem">{% for t in j.tags %}<span class="chip">#{{ t }}</span>{% endfor %}</div>{% endif %}
+          <div class="md">{{ j.content|markdown }}</div>
+        </details>
+        {% endfor %}
+      </section>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if prev_p and next_p %}
+  <nav class="wrap exhibit-nav" aria-label="Other exhibits">
+    <a class="panel" href="{{ url_for('public.project_detail', slug=prev_p.slug) }}" rel="prev"><span class="label">{{ icon('back') }} Previous exhibit</span><b>{{ prev_p.name }}</b><span class="muted small">{{ prev_p.tagline }}</span></a>
+    <a class="panel next" href="{{ url_for('public.project_detail', slug=next_p.slug) }}" rel="next"><span class="label">Next exhibit {{ icon('arrow') }}</span><b>{{ next_p.name }}</b><span class="muted small">{{ next_p.tagline }}</span></a>
+  </nav>
+  {% endif %}
+  {% if others %}
+  <section class="block wrap" style="padding-top:1rem">
+    <div class="section-head"><div><span class="eyebrow">Continue exploring</span><h2>Related exhibits</h2></div><a class="btn" href="{{ url_for('public.projects') }}">Back to exhibition</a></div>
+    <div class="proj-grid">{% for p in others %}{{ project_card(p) }}{% endfor %}</div>
+  </section>
+  {% endif %}
+</article>
+{% endblock %}

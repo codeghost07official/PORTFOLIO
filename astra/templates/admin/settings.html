@@ -1,0 +1,19 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import icon %}
+{% set current = (sections|selectattr(0, "equalto", section)|first)[1] %}
+{% block title %}{{ current }} · System{% endblock %}
+{% block init %}system{% endblock %}
+{% block main_attrs %}data-section="{{ section }}"{% endblock %}
+{% block crumbs %}<span class="sep">/</span><a href="{{ url_for('admin.settings') }}">System</a><span class="sep">/</span><span class="cur">{{ current }}</span>{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow-sm">System</span><h1>{{ current }}</h1><p>Secrets stay in server environment variables — nothing here is exposed to visitors.</p></div></div>
+<div class="settings-layout">
+  <nav class="settings-nav" aria-label="Settings sections">
+    {% for key, label, ic in sections %}
+    <a class="side-link {{ 'active' if key == section }}" href="{{ url_for('admin.settings', section=key) }}"{% if key == section %} aria-current="page"{% endif %}>{{ icon(ic) }}<span>{{ label }}</span></a>
+    {% endfor %}
+  </nav>
+  <div class="stack" id="settings-root"><div class="skeleton" style="height:200px"></div></div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,11 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ view_label }} · Tasks{% endblock %}
+{% block init %}tasks{% endblock %}
+{% block main_attrs %}data-view="{{ view }}"{% endblock %}
+{% block crumbs %}<span class="sep">/</span>{% if view == subnav[0][0] %}<span class="cur">Tasks</span>{% else %}<a href="{{ url_for('admin.tasks') }}">Tasks</a><span class="sep">/</span><span class="cur">{{ view_label }}</span>{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow-sm">Tasks</span><h1>{{ 'Tasks' if view == subnav[0][0] else view_label }}</h1><p>A simple personal to-do list. Priority and due dates are optional.</p></div>
+  <div class="actions"><button class="btn primary" type="button" data-quick-task>+ New task</button></div></div>
+{% set section_label = 'Tasks' %}{% include "admin/_subnav.html" %}
+<div id="sec"><div class="skeleton" style="height:120px"></div></div>
+{% endblock %}

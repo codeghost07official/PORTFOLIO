@@ -1,0 +1,43 @@
+{% extends "public/base.html" %}
+{% from "_icons.html" import icon %}
+{% from "public/_macros.html" import project_card %}
+{% block title %}Achievements — {{ profile.name }}{% endblock %}
+{% block content %}
+<section class="wrap page-hero">
+  <span class="eyebrow">Hall 03 · Records</span>
+  <h1>Achievements</h1>
+  <p class="lead">Recognitions and milestones, along with every project that made it to completion.</p>
+</section>
+
+<section class="wrap">
+  <div class="stats reveal">
+    <div class="stat"><div class="num" data-count="{{ profile.achievements|length }}">{{ profile.achievements|length }}</div><div class="lbl">Recorded achievements</div></div>
+    <div class="stat"><div class="num" data-count="{{ stats.completed }}">{{ stats.completed }}</div><div class="lbl">Projects shipped</div></div>
+    <div class="stat"><div class="num" data-count="{{ stats.active }}">{{ stats.active }}</div><div class="lbl">In active development</div></div>
+    <div class="stat"><div class="num" data-count="{{ stats.technologies }}">{{ stats.technologies }}</div><div class="lbl">Technologies mastered</div></div>
+  </div>
+</section>
+
+<section class="wrap block">
+  {% if profile.achievements %}
+  <div class="ach-wall">
+    {% for a in profile.achievements %}
+    <article class="panel ach corners reveal">
+      <div class="row"><div class="ach-icon">{{ icon('trophy') }}</div><span class="mono dim small">REC-{{ '%03d'|format(loop.index) }}</span><span class="spacer"></span>{% if a.date %}<span class="badge plain">{{ a.date }}</span>{% endif %}</div>
+      <h3>{{ a.title }}</h3>
+      {% if a.detail %}<p>{{ a.detail }}</p>{% endif %}
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="panel empty"><div class="empty-icon">{{ icon('trophy') }}</div><h4>Records being compiled</h4><p>Achievements will appear here soon.</p></div>
+  {% endif %}
+</section>
+
+{% if completed %}
+<section class="wrap block">
+  <div class="section-head reveal"><div><span class="eyebrow">Shipped</span><h2>Completed projects</h2></div></div>
+  <div class="proj-grid">{% for p in completed %}{{ project_card(p) }}{% endfor %}</div>
+</section>
+{% endif %}
+{% endblock %}

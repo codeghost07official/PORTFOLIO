@@ -1,0 +1,24 @@
+# ASTRA — Python dependencies
+# Install with:  pip install -r requirements.txt   (inside a virtual environment)
+
+# Web framework (includes Werkzeug for password hashing, Jinja2, MarkupSafe)
+Flask>=3.0,<4.0
+
+# Production WSGI server used on Render (Linux/macOS; on Windows run `python app.py` locally)
+gunicorn>=22.0,<24.0
+
+# Loads variables from a local .env file during development
+python-dotenv>=1.0,<2.0
+
+# HTTP client: Turso HTTP API + Google Gemini REST API
+requests>=2.31,<3.0
+
+# Markdown rendering + HTML sanitisation (XSS protection)
+Markdown>=3.5,<4.0
+nh3>=0.2.15,<1.0
+
+# --- Optional -------------------------------------------------------------
+# Turso's native libSQL SDK. NOT required: ASTRA talks to Turso through Turso's
+# official HTTP API by default (pure Python, works on every Python version).
+# If you prefer the SDK, uncomment the line below and set TURSO_DRIVER=libsql.
+# libsql>=0.1.8

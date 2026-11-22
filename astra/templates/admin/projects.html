@@ -1,0 +1,18 @@
+{% extends "admin/base.html" %}
+{% block title %}Projects{% endblock %}
+{% block init %}projects{% endblock %}
+{% block crumbs %}<span class="sep">/</span><span class="cur">Projects</span>{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><span class="eyebrow-sm">Projects</span><h1>Projects</h1><p>Build, journal, and decide what the world sees.</p></div>
+  <div class="actions"><button class="btn primary" type="button" data-new>New project</button></div>
+</div>
+{% set section_label = 'Projects' %}{% include "admin/_subnav.html" %}
+<div id="pstats"></div>
+<div class="toolbar" style="margin-top:1rem">
+  <input type="search" id="pq" placeholder="Search projects…" aria-label="Search projects">
+  <select id="pstatus" aria-label="Status"><option value="">All statuses</option><option value="in_progress">In progress</option><option value="completed">Completed</option></select>
+  <select id="psort" aria-label="Sort"><option value="updated">Recently updated</option><option value="name">Name</option><option value="target">Target date</option></select>
+</div>
+<div id="plist"></div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% block title %}Public Profile{% endblock %}
+{% block init %}profile{% endblock %}
+{% block crumbs %}<span class="sep">/</span><a href="{{ url_for('admin.project_list') }}">Projects</a><span class="sep">/</span><span class="cur">Public Profile</span>{% endblock %}
+{% block content %}
+<div class="page-head"><div><span class="eyebrow-sm">Projects · public exhibition</span><h1>Public Profile</h1>
+  <p>Your identity, contact details and the look of the public site, plus the public AI guide.</p></div></div>
+{% set section_label = 'Projects' %}{% include "admin/_subnav.html" %}
+<div class="stack" id="settings-root" data-sections="profile,appearance,chatbot"><div class="skeleton" style="height:200px"></div></div>
+{% endblock %}

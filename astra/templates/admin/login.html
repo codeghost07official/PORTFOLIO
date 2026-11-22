@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>System access · ASTRA</title>
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&family=Orbitron:wght@700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v={{ asset_v }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}?v={{ asset_v }}">
+  <script src="{{ url_for('static', filename='js/login.js') }}?v={{ asset_v }}" defer></script>
+</head>
+<body class="login-page">
+  <main class="login-card">
+    <h1 class="login-title">ASTRA</h1>
+    {% set locked = error and 'Too many' in error %}
+    {% if mode == 'pin' %}
+      <p class="login-sub">Enter PIN</p>
+      <form method="post" class="pin-form" id="pin-form" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="mode" value="pin">
+        <input type="hidden" name="pin" id="pin-value">
+        <div class="pin-boxes" role="group" aria-label="4-digit PIN">
+          {% for i in range(4) %}
+          <input class="pin-digit" type="password" inputmode="numeric" pattern="[0-9]*"
+                 autocomplete="{{ 'one-time-code' if i == 0 else 'off' }}" aria-label="Digit {{ i + 1 }}"
+                 {{ 'autofocus' if i == 0 }} {{ 'disabled' if locked }}>
+          {% endfor %}
+        </div>
+        {% if error %}<div class="login-err" role="alert">{{ error }}</div>{% endif %}
+        <button class="btn primary login-btn" type="submit" {{ 'disabled' if locked }}>Unlock</button>
+      </form>
+      <p class="login-links"><a href="?mode=reset">Forgot PIN?</a></p>
+    {% else %}
+      <p class="login-sub">{{ 'Create your PIN' if mode == 'setup' else 'Reset your PIN' }}</p>
+      <p class="login-note">Confirm it's you with your admin username and password, then choose a 4-digit PIN.</p>
+      {% if not configured %}<div class="login-err" role="alert">Login is disabled until ADMIN_USERNAME and ADMIN_PASSWORD_HASH are set on the server.</div>{% endif %}
+      {% if error %}<div class="login-err" role="alert">{{ error }}</div>{% endif %}
+      <form method="post" class="stack" autocomplete="on">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="mode" value="{{ mode }}">
+        <div class="field"><label for="username">Username</label><input id="username" name="username" type="text" autocomplete="username" required autofocus {{ 'disabled' if locked }}></div>
+        <div class="field"><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" required {{ 'disabled' if locked }}></div>
+        <div class="row-2">
+          <div class="field"><label for="new_pin">New PIN</label><input id="new_pin" name="new_pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" minlength="4" autocomplete="new-password" required {{ 'disabled' if locked }}></div>
+          <div class="field"><label for="confirm_pin">Repeat PIN</label><input id="confirm_pin" name="confirm_pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" minlength="4" autocomplete="new-password" required {{ 'disabled' if locked }}></div>
+        </div>
+        <button class="btn primary login-btn" type="submit" {{ 'disabled' if locked or not configured }}>{{ 'Create PIN' if mode == 'setup' else 'Reset PIN' }}</button>
+      </form>
+      {% if has_pin %}<p class="login-links"><a href="?mode=pin">← Back to PIN</a></p>{% endif %}
+    {% endif %}
+    <p class="login-links"><a class="muted" href="{{ url_for('public.index') }}">Back to exhibition</a></p>
+  </main>
+</body>
+</html>

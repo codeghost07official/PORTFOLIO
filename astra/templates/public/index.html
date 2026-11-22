@@ -1,0 +1,117 @@
+{% extends "public/base.html" %}
+{% from "public/_macros.html" import project_card, teaser_card %}
+{% from "_icons.html" import icon %}
+{% block content %}
+<section class="wrap hero" aria-labelledby="hero-title">
+  <div class="hero-copy">
+    <span class="kicker">{{ appearance.hero_kicker }}</span>
+    <h1 id="hero-title"><span class="grad">{{ profile.name }}</span></h1>
+    <p class="role">{{ profile.title }}</p>
+    <p class="intro">{{ profile.intro }}</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="{{ url_for('public.projects') }}">Enter the exhibition {{ icon('arrow') }}</a>
+      <a class="btn" href="{{ url_for('public.about') }}">Who I am</a>
+      {% if chatbot.enabled %}<button class="btn ghost" type="button" data-open-guide>{{ icon('chat') }} Ask the guide</button>{% endif %}
+    </div>
+    <dl class="hero-stats">
+      <div><dt>Exhibits</dt><dd data-count="{{ stats.projects }}">{{ stats.projects }}</dd></div>
+      <div><dt>Shipped</dt><dd data-count="{{ stats.completed }}">{{ stats.completed }}</dd></div>
+      <div><dt>Technologies</dt><dd data-count="{{ stats.technologies }}">{{ stats.technologies }}</dd></div>
+      <div><dt>In progress</dt><dd data-count="{{ stats.in_progress }}">{{ stats.in_progress }}</dd></div>
+    </dl>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <div class="hero-lens"></div>
+    <canvas data-holo="core"></canvas>
+    <span class="hud-label tl">SYS <b>ONLINE</b></span>
+    <span class="hud-label tr">EXHIBITS <b>{{ stats.projects }}</b></span>
+    <span class="hud-label br">CORE <b>STABLE</b></span>
+  </div>
+</section>
+
+<section class="wrap block" aria-labelledby="halls-title">
+  <div class="section-head reveal">
+    <div><span class="eyebrow">Directory · choose a hall</span><h2 id="halls-title">Explore the museum</h2>
+      <p>Each wing of ASTRA is its own space. Step into whichever one interests you.</p></div>
+  </div>
+  <div class="halls">
+    <a class="hall panel reveal" href="{{ url_for('public.projects') }}">
+      <span class="hall-no">01</span><span class="hall-icon">{{ icon('layers') }}</span>
+      <h3>Exhibition</h3><p>Every project on display: what it does, how it works, and how it was built.</p>
+      <span class="hall-meta">{{ stats.projects }} exhibits · {{ stats.technologies }} technologies</span><span class="hall-go">{{ icon('arrow') }}</span>
+    </a>
+    <a class="hall panel reveal" href="{{ url_for('public.about') }}">
+      <span class="hall-no">02</span><span class="hall-icon">{{ icon('cpu') }}</span>
+      <h3>About</h3><p>Identity, interests, technical domains and the full arsenal of skills.</p>
+      <span class="hall-meta">{{ profile.interests|length }} domains</span><span class="hall-go">{{ icon('arrow') }}</span>
+    </a>
+    {% if visibility.show_achievements %}
+    <a class="hall panel reveal" href="{{ url_for('public.achievements') }}">
+      <span class="hall-no">03</span><span class="hall-icon">{{ icon('trophy') }}</span>
+      <h3>Achievements</h3><p>Milestones, recognitions and the projects that crossed the finish line.</p>
+      <span class="hall-meta">{{ profile.achievements|length }} records</span><span class="hall-go">{{ icon('arrow') }}</span>
+    </a>
+    {% endif %}
+    {% if visibility.show_journey %}
+    <a class="hall panel reveal" href="{{ url_for('public.journey') }}">
+      <span class="hall-no">04</span><span class="hall-icon">{{ icon('map') }}</span>
+      <h3>Journey</h3><p>The trajectory so far: chapters, launches and recent build logs.</p>
+      <span class="hall-meta">{{ stats.completed }} shipped · {{ stats.in_progress }} in progress</span><span class="hall-go">{{ icon('arrow') }}</span>
+    </a>
+    {% endif %}
+  </div>
+</section>
+
+{% if featured %}
+<section class="wrap block" aria-labelledby="feat-title">
+  <div class="section-head reveal">
+    <div><span class="eyebrow">Spotlight</span><h2 id="feat-title">Featured exhibits</h2></div>
+    <a class="btn" href="{{ url_for('public.projects') }}">Full exhibition {{ icon('arrow') }}</a>
+  </div>
+  <div class="proj-grid">{% for p in featured %}{{ project_card(p) }}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if workshop %}
+<section class="wrap block" aria-labelledby="ws-title">
+  <div class="section-head reveal"><div><span class="eyebrow">In the workshop</span><h2 id="ws-title">Currently being built</h2>
+    <p>Projects under construction. Their exhibits open once they're complete.</p></div></div>
+  <div class="proj-grid">{% for p in workshop %}{{ teaser_card(p) }}{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if latest_logs or technologies %}
+<section class="wrap block split-block">
+  {% if latest_logs %}
+  <div class="reveal">
+    <span class="eyebrow">Transmission log</span><h2>Latest build notes</h2>
+    <div class="log-list">
+      {% for j in latest_logs %}
+      <a class="log-item" href="{{ url_for('public.project_detail', slug=j.slug) }}#s-journal">
+        <span class="mono small">{{ j.entry_date|date }}</span><b>{{ j.title }}</b><span class="muted small">{{ j.project_name }} · {{ j.content|excerpt(110) }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% if technologies %}
+  <div class="reveal">
+    <span class="eyebrow">Arsenal</span><h2>Most-used technologies</h2>
+    <div class="tech-cloud">{% for t in technologies %}<a class="chip" href="{{ url_for('public.projects', tech=t.name) }}">{{ t.name }}<b>{{ t.n }}</b></a>{% endfor %}</div>
+    <a class="btn ghost" style="margin-top:1rem" href="{{ url_for('public.about') }}#arsenal">Full skill set {{ icon('arrow') }}</a>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if visibility.show_contact %}
+<section class="wrap block">
+  <div class="panel contact corners glow-border reveal">
+    <span class="eyebrow">Transmission</span>
+    <h2>Let's build something</h2>
+    <p class="muted">Collaborations, questions or a quick hello are all welcome.</p>
+    <div class="socials"><a class="btn primary" href="{{ url_for('public.contact') }}">{{ icon('mail') }} Open a channel</a></div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

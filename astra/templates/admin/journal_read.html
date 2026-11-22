@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% from "_icons.html" import icon %}
+{% block init %}journal-read{% endblock %}
+{% block title %}{{ entry.title }} · Journal{% endblock %}
+{% block crumbs %}<span class="sep">/</span><a href="{{ url_for('admin.project_list') }}">Projects</a><span class="sep">/</span><a href="{{ url_for('admin.workspace', pid=entry.project_id) }}">{{ entry.project_name }}</a><span class="sep">/</span><a href="{{ url_for('admin.workspace', pid=entry.project_id, tab='journal') }}">Journal</a><span class="sep">/</span><span class="cur">{{ entry.title }}</span>{% endblock %}
+{% block content %}
+<article class="reader">
+  <header class="reader-head">
+    <div class="row wrap" style="justify-content:center">
+      <span class="badge b-private">Private project journal</span>
+      {% if entry.project_id %}<a class="badge plain" href="{{ url_for('admin.workspace', pid=entry.project_id) }}">{{ entry.project_name }}</a>{% endif %}
+    </div>
+    <h1>{{ entry.title }}</h1>
+    <p class="mono small muted">{{ entry.entry_date|date('%A, %d %B %Y') }} · {{ words }} words · {{ minutes }} min read</p>
+    {% if entry.tags %}<div class="chips" style="justify-content:center">{% for t in entry.tags %}<span class="chip">#{{ t }}</span>{% endfor %}</div>{% endif %}
+    <div class="row wrap" style="justify-content:center;margin-top:1.2rem">
+      <a class="btn primary" href="{{ url_for('admin.journal_edit', jid=entry.id) }}">{{ icon('edit') }} Edit entry</a>
+    </div>
+  </header>
+  <div class="panel reader-body corners">
+    <div class="md">{% if html %}{{ html }}{% else %}<p class="dim">This entry is empty. <a href="{{ url_for('admin.journal_edit', jid=entry.id) }}">Start writing</a>.</p>{% endif %}</div>
+  </div>
+  {% if newer or older %}
+  <nav class="reader-nav" aria-label="Adjacent entries">
+    {% if older %}<a class="panel" href="{{ url_for('admin.journal_read', jid=older.id) }}"><span class="label">← Earlier</span><b>{{ older.title }}</b><span class="dim small">{{ older.entry_date|date }}</span></a>{% else %}<span></span>{% endif %}
+    {% if newer %}<a class="panel next" href="{{ url_for('admin.journal_read', jid=newer.id) }}"><span class="label">Later →</span><b>{{ newer.title }}</b><span class="dim small">{{ newer.entry_date|date }}</span></a>{% endif %}
+  </nav>
+  {% endif %}
+</article>
+{% endblock %}

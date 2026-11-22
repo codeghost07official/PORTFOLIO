@@ -221,3 +221,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- ASTRA ---
+instance/
+*.db
+*.db-wal
+*.db-shm
+.env.local
