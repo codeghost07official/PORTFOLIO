@@ -1,7 +1,7 @@
 """ASTRA entry point.
 
 Local:       python app.py      (requires Turso credentials in .env)
-Production:  gunicorn app:app   (later phase — see render.yaml)
+Production:  gunicorn app:app   (Render; see render.yaml)
 """
 import os
 

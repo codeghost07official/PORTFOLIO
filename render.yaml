@@ -1,5 +1,9 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
 # Deploy: Render dashboard → New → Blueprint → select this repository.
+#
+# DATA: ASTRA stores everything in Turso. Use the SAME TURSO_DATABASE_URL / TURSO_AUTH_TOKEN as your
+# local .env and the deployed site shows all your existing data. Startup only applies migrations that
+# haven't run yet (your database is already up to date), and never wipes or recreates anything.
 services:
   - type: web
     name: astra
@@ -15,25 +19,25 @@ services:
       - key: PYTHON_VERSION
         value: 3.12.7
       - key: ASTRA_ENV
-        value: production
+        value: production          # Secure cookies, HSTS, proxy-aware client IPs
       - key: SECRET_KEY
-        generateValue: true
+        generateValue: true        # signs session cookies only; no data depends on it
       - key: SEED_SAMPLE_DATA
-        value: "true"
+        value: "false"             # never add sample content to your real database
       # ---- fill these in the Render dashboard (never commit them) ----
-      - key: TURSO_DATABASE_URL
+      - key: TURSO_DATABASE_URL    # same value as your local .env
         sync: false
-      - key: TURSO_AUTH_TOKEN
+      - key: TURSO_AUTH_TOKEN      # same value as your local .env
         sync: false
-      - key: ADMIN_USERNAME
+      - key: ADMIN_USERNAME        # needed for "Forgot PIN?" (your PIN itself lives in Turso)
         sync: false
-      - key: ADMIN_PASSWORD_HASH
+      - key: ADMIN_PASSWORD_HASH   # paste WITHOUT the surrounding quotes
         sync: false
-      - key: ADMIN_LOGIN_PATH
+      - key: ADMIN_LOGIN_PATH      # same value as your local .env (e.g. gate)
         sync: false
       - key: GEMINI_API_KEY
         sync: false
-      - key: GEMINI_MODEL
-        value: gemini-3.8-flash
-      - key: GEMINI_FALLBACK_MODEL
-        value: gemini-3.7-flash,gemini-flash-latest
+      - key: GEMINI_MODEL          # copy from your local .env
+        sync: false
+      - key: GEMINI_FALLBACK_MODEL # copy from your local .env
+        sync: false

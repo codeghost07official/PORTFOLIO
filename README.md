@@ -308,12 +308,21 @@ This is a convenience only. Real protection is server-side; see [Security](#secu
 ## Deploying to Render (free tier)
 1. Push this repository to GitHub. Don't commit `.env`.
 2. In the Render dashboard, choose **New → Blueprint** and select the repository. `render.yaml` sets up:
-   - a free Python web service
-   - `gunicorn app:app --workers 1 --threads 4`
+   - a free Python web service (Python 3.12.7)
+   - `gunicorn app:app --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT`
    - the `/healthz` health check
-   - a generated `SECRET_KEY` and `ASTRA_ENV=production`
-3. When prompted, fill in the secret variables: `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, `GEMINI_API_KEY`, and optionally `ADMIN_LOGIN_PATH`.
+   - a generated `SECRET_KEY`, `ASTRA_ENV=production` and `SEED_SAMPLE_DATA=false`
+3. When prompted, fill in the variables, copying each value from your local `.env`:
+   `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` (without quotes),
+   `ADMIN_LOGIN_PATH`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_FALLBACK_MODEL`.
+   Do **not** set `ADMIN_PASSWORD` (plain text, local convenience only) on Render.
 4. Deploy. Visit `https://<service>.onrender.com/healthz`. It should return `{"status":"ok","database":"turso-http"}`.
+5. Open `https://<service>.onrender.com/<ADMIN_LOGIN_PATH>` and sign in with your **existing PIN**: it is stored
+   (hashed) in Turso, so it is the same locally and on Render.
+
+**Your data.** The deployed app reads and writes the same Turso database as your local copy, so every project,
+journal, medicine log, task, expense, setting and conversation is there immediately. Startup only applies schema
+migrations that haven't run yet; it never drops, resets or re-seeds an existing database.
 
 You can also skip the Blueprint and set it up manually: **New → Web Service**, Build command `pip install -r requirements.txt`, Start command as in `render.yaml`, then add the same environment variables.
 
